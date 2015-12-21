@@ -16,7 +16,9 @@ namespace IntelligentScissors
         }
 
         RGBPixel[,] ImageMatrix;
-
+        Graph G;
+        bool firstClick;
+        Vector2D prevClick;
         private void btnOpen_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
@@ -36,10 +38,70 @@ namespace IntelligentScissors
             double sigma = double.Parse(txtGaussSigma.Text);
             int maskSize = (int)nudMaskSize.Value ;
             ImageMatrix = ImageOperations.GaussianFilter1D(ImageMatrix, maskSize, sigma);
+            //Build the graph
+            G = new Graph(ImageMatrix);
+            firstClick = new bool();
+            firstClick = false;
+            prevClick = new Vector2D();
             ImageOperations.DisplayImage(ImageMatrix, pictureBox2);
         }
 
-       
-       
+        private void pictureBox2_MouseClick(object sender, MouseEventArgs e)
+        {
+            if(firstClick==false)
+            {
+                
+                firstClick = true;
+                prevClick.X = e.X;
+                prevClick.Y = e.Y;
+                //Calculates the shortest path in O((V+E)log(V))
+                G.Dijkstra((int)prevClick.X, (int)prevClick.Y);
+            }
+            else
+            {
+                
+                curClick =new Vector2D();
+                curClick.X = e.X;
+                curClick.Y = e.Y;
+                //Draws the path on the window
+                ImageOperations.DisplayImage(G.Draw(prevClick, curClick), pictureBox2);
+                prevClick = curClick;
+                //Destroys the previous calculation and calculates again in O((V+E)log(V))
+                G.Dijkstra((int)prevClick.X, (int)prevClick.Y);
+            }
+        }
+        public Vector2D curClick;
+
+        private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (firstClick == false)
+            {
+
+            }
+            else
+            {
+                G.Dijkstra((int)prevClick.X, (int)prevClick.Y);
+                curClick = new Vector2D();
+                curClick.X = e.X;
+                curClick.Y = e.Y;
+                ImageOperations.DisplayImage(G.Draw(prevClick, curClick), pictureBox2);
+                prevClick = curClick;
+            }
+        }
     }
 }
+
+//Live Wire
+/*if (firstClick == false)
+            {
+                
+            }
+            else
+            {
+                G.Dijkstra((int)prevClick.X, (int)prevClick.Y);
+                curClick = new Vector2D();
+                curClick.X = e.X;
+                curClick.Y = e.Y;
+                ImageOperations.DisplayImage(G.Draw(prevClick, curClick), pictureBox2);
+                prevClick = curClick;
+            }*/

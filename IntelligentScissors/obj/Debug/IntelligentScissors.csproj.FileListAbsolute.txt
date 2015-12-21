@@ -5,3 +5,19 @@ C:\Users\Ah\Dropbox\[ALG'15] Materials\---- Staff only ----\Projects\Intelligent
 C:\Users\Ah\Dropbox\[ALG'15] Materials\---- Staff only ----\Projects\Intelligent Scissors\[TEMPLATE] IntelligentScissors\IntelligentScissors\obj\Debug\IntelligentScissors.exe
 C:\Users\Ah\Dropbox\[ALG'15] Materials\---- Staff only ----\Projects\Intelligent Scissors\[TEMPLATE] IntelligentScissors\IntelligentScissors\obj\Debug\IntelligentScissors.pdb
 C:\Users\Ah\Dropbox\[ALG'15] Materials\---- Staff only ----\Projects\Intelligent Scissors\[TEMPLATE] IntelligentScissors\IntelligentScissors\obj\Debug\IntelligentScissors.MainForm.resources
+C:\Users\alaaa\Google Drive\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.exe
+C:\Users\alaaa\Google Drive\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.pdb
+C:\Users\alaaa\Google Drive\Intelligent-Scissors\IntelligentScissors\bin\Debug\IntelligentScissors.exe
+C:\Users\alaaa\Google Drive\Intelligent-Scissors\IntelligentScissors\bin\Debug\IntelligentScissors.pdb
+C:\Users\alaaa\Google Drive\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.csprojResolveAssemblyReference.cache
+C:\Users\alaaa\Google Drive\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.MainForm.resources
+C:\Users\alaaa\Google Drive\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.Properties.Resources.resources
+C:\Users\alaaa\Google Drive\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.csproj.GenerateResource.Cache
+C:\Users\alaaa\Desktop\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.exe
+C:\Users\alaaa\Desktop\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.pdb
+C:\Users\alaaa\Desktop\Intelligent-Scissors\IntelligentScissors\bin\Debug\IntelligentScissors.exe
+C:\Users\alaaa\Desktop\Intelligent-Scissors\IntelligentScissors\bin\Debug\IntelligentScissors.pdb
+C:\Users\alaaa\Desktop\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.csprojResolveAssemblyReference.cache
+C:\Users\alaaa\Desktop\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.MainForm.resources
+C:\Users\alaaa\Desktop\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.Properties.Resources.resources
+C:\Users\alaaa\Desktop\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.csproj.GenerateResource.Cache

@@ -330,7 +330,12 @@ namespace IntelligentScissors
             return gradient;
         }
 
-  
+        internal static int GetHeight(object imageMatrix)
+        {
+            throw new NotImplementedException();
+        }
+
+
         #endregion
     }
 }
