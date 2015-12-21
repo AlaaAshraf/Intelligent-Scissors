@@ -110,7 +110,7 @@ namespace IntelligentScissors
         public int Height, Width;
         RGBPixel[,] ImageMatrix;
         //First dimension represents the width and the second represents the height
-        Vertex[,] Vertices;
+        public Vertex[,] Vertices;
         public priority_queue Q;
         public Graph(RGBPixel[,] ImageMatrix)
         {
@@ -227,24 +227,7 @@ namespace IntelligentScissors
                 Relax_All(ref u);
             }
         }
-        public RGBPixel[,] Draw(Vector2D prevClick, Vector2D curClick)
-        {
-            //Backtrack on the parent of each pixel and sets the pixel to black or white 
-            Vertex u = new Vertex(0,0);
-            int even = 0;
-            u = Vertices[(int)curClick.X, (int)curClick.Y];
-            while (u.Parent!=null&&(u.Parent.Item1 != prevClick.X || u.Parent.Item2 != prevClick.Y))
-            {
-                if (even % 2 == 0)
-                { ImageMatrix[u.j, u.i].blue = 255; ImageMatrix[u.j, u.i].green = 255; ImageMatrix[u.j, u.i].red = 255; }
-                else
-                { ImageMatrix[u.j, u.i].blue = 0; ImageMatrix[u.j, u.i].green = 0; ImageMatrix[u.j, u.i].red = 0; }
-                even++;
-                u = Vertices[(int)u.Parent.Item1, (int)u.Parent.Item2];
-            }
-            even++;
-            return ImageMatrix;
-        }
+       
 
     }
 }

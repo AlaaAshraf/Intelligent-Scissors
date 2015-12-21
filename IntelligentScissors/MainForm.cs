@@ -63,28 +63,45 @@ namespace IntelligentScissors
                 curClick =new Vector2D();
                 curClick.X = e.X;
                 curClick.Y = e.Y;
-                //Draws the path on the window
-                ImageOperations.DisplayImage(G.Draw(prevClick, curClick), pictureBox2);
+                Draw();
                 prevClick = curClick;
                 //Destroys the previous calculation and calculates again in O((V+E)log(V))
                 G.Dijkstra((int)prevClick.X, (int)prevClick.Y);
+                
             }
+            
         }
         public Vector2D curClick;
+        private void Draw()
+        {
+            Vertex u = new Vertex(0, 0);
+            Bitmap b = (Bitmap)pictureBox2.Image;
+            int even = 0;
+            u = G.Vertices[(int)curClick.X, (int)curClick.Y];
+            while (u.Parent != null && (u.Parent.Item1 != prevClick.X || u.Parent.Item2 != prevClick.Y))
+            {
+                if (even % 2 == 0)
+                { b.SetPixel((u.i), (u.j), Color.Black); }
+                else
+                { b.SetPixel((u.i), (u.j), Color.White); }
+                even++;
+                u = G.Vertices[(int)u.Parent.Item1, (int)u.Parent.Item2];
+                pictureBox2.Refresh();
+            }
+            
+            
+            
+        }
 
         private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
         {
-            if (firstClick == false)
-            {
-
-            }
-            else
+            if(firstClick==true)
             {
                 G.Dijkstra((int)prevClick.X, (int)prevClick.Y);
                 curClick = new Vector2D();
                 curClick.X = e.X;
                 curClick.Y = e.Y;
-                ImageOperations.DisplayImage(G.Draw(prevClick, curClick), pictureBox2);
+                Draw();
                 prevClick = curClick;
             }
         }
@@ -92,16 +109,4 @@ namespace IntelligentScissors
 }
 
 //Live Wire
-/*if (firstClick == false)
-            {
-                
-            }
-            else
-            {
-                G.Dijkstra((int)prevClick.X, (int)prevClick.Y);
-                curClick = new Vector2D();
-                curClick.X = e.X;
-                curClick.Y = e.Y;
-                ImageOperations.DisplayImage(G.Draw(prevClick, curClick), pictureBox2);
-                prevClick = curClick;
-            }*/
+/**/
