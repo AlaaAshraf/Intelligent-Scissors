@@ -11,6 +11,8 @@ namespace IntelligentScissors
     {
         public  Tuple<int, int> Parent;
         public double Distance;
+        //(i,j)->position of the vertex in the array Vertices
+        //index of the vertex in the heap
         public int i, j,index;
         public Vertex(int x,int y)
         {
@@ -106,7 +108,7 @@ namespace IntelligentScissors
     public class Graph
     {
         //first dimension = right neighbour, Second = bottom, third = left, fourth = upper
-        double[,,] Weight;
+        public double[,,] Weight;
         public int Height, Width;
         RGBPixel[,] ImageMatrix;
         //First dimension represents the width and the second represents the height
@@ -133,10 +135,13 @@ namespace IntelligentScissors
                     Vertices[i, j] = new Vertex(i,j);
                     Vector2D Energy = new Vector2D();
                     Energy = ImageOperations.CalculatePixelEnergies(i, j, ImageMatrix);
-                    Energy.X += 0.0000000001;
-                    Energy.Y += 0.0000000001;
-                    Weight[i, j, 0] = 1.0 / Energy.X;
-                    Weight[i, j, 1] = 1.0 / Energy.Y;
+                    if (Energy.X != 0)
+                        Weight[i, j, 0] = 1.0 / Energy.X;
+                    else
+                        Weight[i, j, 0] = 1E300;
+                    if (Energy.Y != 0)
+                        Weight[i, j, 1] = 1.0 / Energy.Y;
+                    else Weight[i, j, 1] = 1E300;
                     if (j > 0)
                         Weight[i, j, 2] =Weight[i,j-1,0];
                     else Weight[i, j, 2] = double.MaxValue;
@@ -190,9 +195,9 @@ namespace IntelligentScissors
             }
             //Set the source distance to zero
             Vertices[x, y].Distance = 0;
-            //ترقيع :D
+            //Pruning
 
-            Vertex[,] Hoba;
+            Vertex[,] Vertices1;
             int Width2=0, Height2=0,x1,x2,y1,y2;
             int diff = 100;
             x1 = Math.Max(x - diff, 0);
@@ -201,22 +206,23 @@ namespace IntelligentScissors
             y2 = Math.Min(Height, y + diff);
             Width2 = x2 - x1;
             Height2= y2-y1;
-            Hoba = new Vertex[Width2, Height2];
+            Vertices1 = new Vertex[Width2, Height2];
             int w1 = 0, h1 = 0;
             for(int i= x1; i< x2; i++)
             {
                 h1 = 0;
                 for(int j= y1; j< y2; j++)
                 {
-                    Hoba[w1, h1] = Vertices[i, j];
+                    Vertices1[w1, h1] = Vertices[i, j];
                     h1++;
                 }
                 w1++;
             }
-            Q = new priority_queue(ref Hoba, Height2, Width2);
-            //End of ترقيع
-
             //Priority queue using heap containing all vertices
+            Q = new priority_queue(ref Vertices1, Height2, Width2);
+            //End of Pruning
+
+            
             //Q = new priority_queue(ref Vertices, Height, Width);
 
             while (Q.heap_size>0)

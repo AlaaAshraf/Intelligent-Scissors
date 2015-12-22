@@ -45,37 +45,55 @@ namespace IntelligentScissors
             prevClick = new Vector2D();
             ImageOperations.DisplayImage(ImageMatrix, pictureBox2);
         }
-
+        public Vector2D curClick;
+        Bitmap beforeClick;
         private void pictureBox2_MouseClick(object sender, MouseEventArgs e)
         {
-            if(firstClick==false)
+            if (e.Button == MouseButtons.Right)
             {
-                
+                firstClick = false;
+                pictureBox2.Image = beforeClick;
+                pictureBox2.Refresh();
+                return;
+            }
+                if (firstClick == false)
+            {
+
                 firstClick = true;
                 prevClick.X = e.X;
                 prevClick.Y = e.Y;
-                //Calculates the shortest path in O((V+E)log(V))
-                G.Dijkstra((int)prevClick.X, (int)prevClick.Y);
+                
             }
             else
             {
-                
-                curClick =new Vector2D();
+                curClick = new Vector2D();
                 curClick.X = e.X;
                 curClick.Y = e.Y;
                 Draw();
                 prevClick = curClick;
-                //Destroys the previous calculation and calculates again in O((V+E)log(V))
-                G.Dijkstra((int)prevClick.X, (int)prevClick.Y);
-                
             }
-            
+                //Destroys the previous calculation and calculates again in O((V+E)log(V))
+                G.Dijkstra((int)prevClick.X, (int)prevClick.Y);    
+            //Stores the image after each click
+            beforeClick = (Bitmap)(pictureBox2.Image.Clone());
         }
-        public Vector2D curClick;
+        private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (firstClick == true)
+            {
+                curClick = new Vector2D();
+                curClick.X = e.X;
+                curClick.Y = e.Y;
+                pictureBox2.Image = beforeClick;
+                pictureBox2.Refresh();
+                Draw();
+            }
+        }
+        
         private void Draw()
         {
             Vertex u = new Vertex(0, 0);
-            Bitmap b = (Bitmap)pictureBox2.Image;
+            Bitmap b = new Bitmap(beforeClick);
             int even = 0;
             u = G.Vertices[(int)curClick.X, (int)curClick.Y];
             while (u.Parent != null && (u.Parent.Item1 != prevClick.X || u.Parent.Item2 != prevClick.Y))
@@ -86,25 +104,15 @@ namespace IntelligentScissors
                 { b.SetPixel((u.i), (u.j), Color.White); }
                 even++;
                 u = G.Vertices[(int)u.Parent.Item1, (int)u.Parent.Item2];
-                pictureBox2.Refresh();
+                
             }
-            
-            
-            
+            pictureBox2.Image = b;
+            pictureBox2.Refresh();
+
+
         }
 
-        private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
-        {
-            if(firstClick==true)
-            {
-                G.Dijkstra((int)prevClick.X, (int)prevClick.Y);
-                curClick = new Vector2D();
-                curClick.X = e.X;
-                curClick.Y = e.Y;
-                Draw();
-                prevClick = curClick;
-            }
-        }
+        
     }
 }
 
