@@ -143,10 +143,10 @@ namespace IntelligentScissors
                     if (Energy.X != 0)
                         Weight[i, j, 0] = 1.0 / Energy.X;
                     else
-                        Weight[i, j, 0] = 1E300;
+                        Weight[i, j, 0] = 1E280;
                     if (Energy.Y != 0)
                         Weight[i, j, 1] = 1.0 / Energy.Y;
-                    else Weight[i, j, 1] = 1E300;
+                    else Weight[i, j, 1] = 1E280;
                     if (j > 0)
                         Weight[i, j, 2] =Weight[i,j-1,0];
                     else Weight[i, j, 2] = double.MaxValue;

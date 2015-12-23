@@ -17,9 +17,12 @@ namespace IntelligentScissors
 
         RGBPixel[,] ImageMatrix;
         Graph G;
-        int frequency, contrast;
-        bool firstClick;
-        Vector2D prevClick;
+        int frequency;
+        double energyDifference;
+        bool firstClick,userAutomaticAnchor=false;
+        Vector2D prevClick, curClick;
+        Bitmap beforeClick;
+
         private void btnOpen_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
@@ -28,10 +31,14 @@ namespace IntelligentScissors
                 //Open the browsed image and display it
                 string OpenedFilePath = openFileDialog1.FileName;
                 ImageMatrix = ImageOperations.OpenImage(OpenedFilePath);
-                ImageOperations.DisplayImage(ImageMatrix, pictureBox1);
+                ImageOperations.DisplayImage(ImageMatrix, pictureBox2);
             }
             txtWidth.Text = ImageOperations.GetWidth(ImageMatrix).ToString();
             txtHeight.Text = ImageOperations.GetHeight(ImageMatrix).ToString();
+            //Build the graph
+            G = new Graph(ImageMatrix);
+            firstClick = false;
+            prevClick = new Vector2D();
         }
 
         private void btnGaussSmooth_Click(object sender, EventArgs e)
@@ -41,13 +48,10 @@ namespace IntelligentScissors
             ImageMatrix = ImageOperations.GaussianFilter1D(ImageMatrix, maskSize, sigma);
             //Build the graph
             G = new Graph(ImageMatrix);
-            firstClick = new bool();
-            firstClick = false;
-            prevClick = new Vector2D();
+            
             ImageOperations.DisplayImage(ImageMatrix, pictureBox2);
         }
-        public Vector2D curClick;
-        Bitmap beforeClick;
+        
         private void pictureBox2_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
@@ -62,6 +66,25 @@ namespace IntelligentScissors
             Position.Y = e.Y;
             MouseClick(Position);
         }
+
+        private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (firstClick == true)
+            {
+                curClick = new Vector2D();
+                curClick.X = e.X;
+                curClick.Y = e.Y;
+                if (userAutomaticAnchor == true)
+                {
+                    if (AutomaticAnchor() == true)
+                        return;
+                }
+                pictureBox2.Image = beforeClick;
+                pictureBox2.Refresh();
+                Draw();
+            }
+        }
+
         private void MouseClick(Vector2D e)
         {
             
@@ -86,23 +109,18 @@ namespace IntelligentScissors
             //Stores the image after each click
             beforeClick = (Bitmap)(pictureBox2.Image.Clone());
         }
-        private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            if (firstClick == true)
-            {
-                curClick = new Vector2D();
-                curClick.X = e.X;
-                curClick.Y = e.Y;
-                /*if (AutomaticAnchor() == true)
-                    return;*/
-                pictureBox2.Image = beforeClick;
-                pictureBox2.Refresh();
-                Draw();
-            }
+            userAutomaticAnchor = !userAutomaticAnchor;
         }
 
         private bool AutomaticAnchor()
         {
+            frequency = Convert.ToInt32(userFrequency.Text);
+            frequency = int.Parse(userFrequency.Text);
+            energyDifference= Convert.ToDouble(userDifference.Text);
+            energyDifference = double.Parse(userDifference.Text);
             Vertex u = new Vertex(0, 0);
             Vertex parent = new Vertex(0, 0);
             u = G.Vertices[(int)curClick.X, (int)curClick.Y];
@@ -111,7 +129,7 @@ namespace IntelligentScissors
            
                 parent = G.Vertices[(int)u.Parent.Item1, (int)u.Parent.Item2];
                 double distanceDifference = Math.Abs(u.Distance - parent.Distance);
-                if(distanceDifference>contrast)
+                if(distanceDifference>energyDifference)
                 {
                     curClick.X = u.i;
                     curClick.Y = u.j;
@@ -121,6 +139,7 @@ namespace IntelligentScissors
             MouseClick(curClick);
             return true;
         }
+
         private void Draw()
         {
             Vertex u = new Vertex(0, 0);
@@ -148,6 +167,3 @@ namespace IntelligentScissors
         
     }
 }
-
-//Live Wire
-/**/
