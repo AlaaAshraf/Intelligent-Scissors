@@ -117,8 +117,7 @@ namespace IntelligentScissors
         //First dimension represents the width and the second represents the height
         public Vertex[,] Vertices;
         public priority_queue Q;
-        //Pruning distance
-        public int diff = 250;
+        
         public Graph(RGBPixel[,] ImageMatrix)
         {
             this.ImageMatrix = ImageMatrix;
@@ -201,8 +200,10 @@ namespace IntelligentScissors
             }
             //Set the source distance to zero
             Vertices[x, y].Distance = 0;
-            //Pruning
 
+            #region Pruning
+            //Pruning distance
+            int diff = 250;
             Vertex[,] Vertices1;
             int Width2=0, Height2=0,x1,x2,y1,y2;
             
@@ -227,9 +228,7 @@ namespace IntelligentScissors
             //Priority queue using heap containing all vertices
             Q = new priority_queue(ref Vertices1, Height2, Width2);
             //End of Pruning
-
-            
-            //Q = new priority_queue(ref Vertices, Height, Width);
+            #endregion
 
             while (Q.heap_size>0)
             {
