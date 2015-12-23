@@ -17,6 +17,7 @@ namespace IntelligentScissors
 
         RGBPixel[,] ImageMatrix;
         Graph G;
+        int frequency, contrast;
         bool firstClick;
         Vector2D prevClick;
         private void btnOpen_Click(object sender, EventArgs e)
@@ -56,13 +57,21 @@ namespace IntelligentScissors
                 pictureBox2.Refresh();
                 return;
             }
-                if (firstClick == false)
+            Vector2D Position = new Vector2D();
+            Position.X = e.X;
+            Position.Y = e.Y;
+            MouseClick(Position);
+        }
+        private void MouseClick(Vector2D e)
+        {
+            
+            if (firstClick == false)
             {
 
                 firstClick = true;
                 prevClick.X = e.X;
                 prevClick.Y = e.Y;
-                
+
             }
             else
             {
@@ -72,8 +81,8 @@ namespace IntelligentScissors
                 Draw();
                 prevClick = curClick;
             }
-                //Destroys the previous calculation and calculates again in O((V+E)log(V))
-                G.Dijkstra((int)prevClick.X, (int)prevClick.Y);    
+            //Destroys the previous calculation and calculates again in O((V+E)log(V))
+            G.Dijkstra((int)prevClick.X, (int)prevClick.Y);
             //Stores the image after each click
             beforeClick = (Bitmap)(pictureBox2.Image.Clone());
         }
@@ -84,26 +93,50 @@ namespace IntelligentScissors
                 curClick = new Vector2D();
                 curClick.X = e.X;
                 curClick.Y = e.Y;
+                /*if (AutomaticAnchor() == true)
+                    return;*/
                 pictureBox2.Image = beforeClick;
                 pictureBox2.Refresh();
                 Draw();
             }
         }
-        
+
+        private bool AutomaticAnchor()
+        {
+            Vertex u = new Vertex(0, 0);
+            Vertex parent = new Vertex(0, 0);
+            u = G.Vertices[(int)curClick.X, (int)curClick.Y];
+            if (u.VerticesToParent <= frequency)
+                return false;
+           
+                parent = G.Vertices[(int)u.Parent.Item1, (int)u.Parent.Item2];
+                double distanceDifference = Math.Abs(u.Distance - parent.Distance);
+                if(distanceDifference>contrast)
+                {
+                    curClick.X = u.i;
+                    curClick.Y = u.j;
+                }
+                u = parent;
+            
+            MouseClick(curClick);
+            return true;
+        }
         private void Draw()
         {
             Vertex u = new Vertex(0, 0);
+            Vertex parent = new Vertex(0, 0);
             Bitmap b = new Bitmap(beforeClick);
-            int even = 0;
+            //int even = 0;
             u = G.Vertices[(int)curClick.X, (int)curClick.Y];
             while (u.Parent != null && (u.Parent.Item1 != prevClick.X || u.Parent.Item2 != prevClick.Y))
             {
-                if (even % 2 == 0)
+                parent= G.Vertices[(int)u.Parent.Item1, (int)u.Parent.Item2];
+                if ((u.i+u.j) % 2 == 0)
                 { b.SetPixel((u.i), (u.j), Color.Black); }
                 else
                 { b.SetPixel((u.i), (u.j), Color.White); }
-                even++;
-                u = G.Vertices[(int)u.Parent.Item1, (int)u.Parent.Item2];
+                //even++;
+                u = parent;
                 
             }
             pictureBox2.Image = b;

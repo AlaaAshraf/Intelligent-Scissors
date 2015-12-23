@@ -11,6 +11,8 @@ namespace IntelligentScissors
     {
         public  Tuple<int, int> Parent;
         public double Distance;
+        //Number of vertices between current vertex and its parent
+        public int VerticesToParent;
         //(i,j)->position of the vertex in the array Vertices
         //index of the vertex in the heap
         public int i, j,index;
@@ -20,6 +22,7 @@ namespace IntelligentScissors
             i = x;
             Parent = null;
             Distance = double.MaxValue;
+            VerticesToParent = 0;
         }
     }
 
@@ -114,6 +117,8 @@ namespace IntelligentScissors
         //First dimension represents the width and the second represents the height
         public Vertex[,] Vertices;
         public priority_queue Q;
+        //Pruning distance
+        public int diff = 250;
         public Graph(RGBPixel[,] ImageMatrix)
         {
             this.ImageMatrix = ImageMatrix;
@@ -175,6 +180,7 @@ namespace IntelligentScissors
                 v.Distance = u.Distance + w;
                 Tuple<int, int> temp = new Tuple<int, int>(u.i, u.j);
                 v.Parent = temp;
+                v.VerticesToParent = u.VerticesToParent + 1;
                 while (Q.parent(v.index)>0&&Q.arr[v.index].Distance<Q.arr[Q.parent(v.index)].Distance)
                 {
                     
@@ -199,7 +205,7 @@ namespace IntelligentScissors
 
             Vertex[,] Vertices1;
             int Width2=0, Height2=0,x1,x2,y1,y2;
-            int diff = 100;
+            
             x1 = Math.Max(x - diff, 0);
             x2 = Math.Min(Width, x + diff);
             y1 = Math.Max(y - diff, 0);
