@@ -47,6 +47,8 @@ namespace IntelligentScissors
             int maskSize = (int)nudMaskSize.Value ;
             ImageMatrix = ImageOperations.GaussianFilter1D(ImageMatrix, maskSize, sigma);
             //Build the graph
+            G = null;
+            GC.Collect();
             G = new Graph(ImageMatrix);
             
             ImageOperations.DisplayImage(ImageMatrix, pictureBox2);
