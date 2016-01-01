@@ -9,14 +9,13 @@ namespace IntelligentScissors
 
     public class Vertex
     {
-        public  Tuple<int, int> Parent;
+        public Tuple<int, int> Parent;
         public double Distance;
-        //Number of vertices between current vertex and its parent
-        public int VerticesToParent;
-        //(i,j)->position of the vertex in the array Vertices
-        //index of the vertex in the heap
-        public int i, j,index;
-        public Vertex(int x,int y)
+        public int VerticesToParent; //Number of vertices between current vertex and its parent
+        public int i, j; //(i,j)->position of the vertex in the array Vertices
+        public int index; //index of the vertex in the heap
+
+        public Vertex(int x, int y)
         {
             j = y;
             i = x;
@@ -36,7 +35,7 @@ namespace IntelligentScissors
             lhs = rhs;
             rhs = temp;
         }
-        public void Swap<T>( T lhs,  T rhs)
+        public void Swap<T>(T lhs, T rhs)
         {
             T temp;
             temp = lhs;
@@ -61,29 +60,29 @@ namespace IntelligentScissors
         {
             if (heap_size == 0)
                 return;
-            int l = left(i), r = right(i),smallest=i;
+            int l = left(i), r = right(i), smallest = i;
             if (l <= heap_size && arr[l].Distance < arr[smallest].Distance)
                 smallest = l;
             if (r <= heap_size && arr[r].Distance < arr[smallest].Distance)
                 smallest = r;
-            if (smallest!= i)
+            if (smallest != i)
             {
-                Swap<int>(ref arr[smallest].index,ref arr[i].index);
+                Swap<int>(ref arr[smallest].index, ref arr[i].index);
                 Swap<Vertex>(ref arr[smallest], ref arr[i]);
-                
+
                 min_heapify(smallest);
             }
 
         }
-        public priority_queue(ref Vertex[,] Vertices,int Height, int Width)
+        public priority_queue(ref Vertex[,] Vertices, int Height, int Width)
         {
             length = Height * Width;
             heap_size = length;
-            arr = new Vertex[length+1];
+            arr = new Vertex[length + 1];
             int index = 1;
-            for(int i=0; i<Width; i++)
+            for (int i = 0; i < Width; i++)
             {
-                for(int j=0; j<Height; j++)
+                for (int j = 0; j < Height; j++)
                 {
                     arr[index] = Vertices[i, j];
                     //Vertices[i, j].Distance = 757;
@@ -92,7 +91,7 @@ namespace IntelligentScissors
                 }
             }
 
-            for(int i=length/2; i>0; i--)
+            for (int i = length / 2; i > 0; i--)
             {
                 min_heapify(i);
             }
@@ -111,83 +110,88 @@ namespace IntelligentScissors
     public class Graph
     {
         //first dimension = right neighbour, Second = bottom, third = left, fourth = upper
-        public double[,,] Weight;
+        //public double[,,] Weight;
         public int Height, Width;
         RGBPixel[,] ImageMatrix;
         //First dimension represents the width and the second represents the height
         public Vertex[,] Vertices;
         public priority_queue Q;
-        
+
         public Graph(RGBPixel[,] ImageMatrix)
         {
             this.ImageMatrix = ImageMatrix;
+
             //Get Width and Height
             Height = ImageOperations.GetHeight(ImageMatrix);
             Width = ImageOperations.GetWidth(ImageMatrix);
-
+            GC.Collect();
             //Allocate 2D array of vertices
             Vertices = new Vertex[Width, Height];
+        }
 
-            //Caclulate the Weight between pixels
-            //first dimension = right neighbour, Second = bottom, third = left, fourth = upper
-            Weight = new double[Width, Height,4];
-            for(int i=0; i<Width; i++)
+        private float GetWeight(int x1, int y1, int x2, int y2)
+        {
+
+            if (x1 < x2) // Second cell to the right of the first cell
             {
-                for(int j=0; j<Height; j++)
-                {
-                    //Allocate a new vertex
-                    Vertices[i, j] = new Vertex(i,j);
-                    Vector2D Energy = new Vector2D();
-                    Energy = ImageOperations.CalculatePixelEnergies(i, j, ImageMatrix);
-                    if (Energy.X != 0)
-                        Weight[i, j, 0] = 1.0 / Energy.X;
-                    else
-                        Weight[i, j, 0] = 1E280;
-                    if (Energy.Y != 0)
-                        Weight[i, j, 1] = 1.0 / Energy.Y;
-                    else Weight[i, j, 1] = 1E280;
-                    if (j > 0)
-                        Weight[i, j, 2] =Weight[i,j-1,0];
-                    else Weight[i, j, 2] = double.MaxValue;
-                    if (i > 0)
-                        Weight[i, j, 3] = Weight[i-1,j,1];
-                    else Weight[i, j, 3] = double.MaxValue;
-                }
+                float temp = (float)ImageOperations.CalculatePixelEnergies(x1, y1, ImageMatrix).X;
+                if (temp != 0) return (float)1.0 / temp;
+                return 1E30f;
+            }
+            else if (x2 < x1) // First cell to the right of the second cell
+            {
+                float temp = (float)ImageOperations.CalculatePixelEnergies(x2, y2, ImageMatrix).X;
+                if (temp != 0) return (float)1.0 / temp;
+                return 1E30f;
+            }
+            else if (y1 < y2) // Second cell below the first cell
+            {
+                float temp = (float)ImageOperations.CalculatePixelEnergies(x1, y1, ImageMatrix).Y;
+                if (temp != 0) return (float)1.0 / temp;
+                return 1E30f;
+            }
+            else // First cell below the second cell
+            {
+                float temp = (float)ImageOperations.CalculatePixelEnergies(x2, y2, ImageMatrix).Y;
+                if (temp != 0) return (float)1.0 / temp;
+                return 1E30f;
             }
         }
-        
+
         void Relax_All(ref Vertex u)
         {
             //Relaxes the edges between u and all its neighbours
             if (u.j < Height - 1)
-                Relax(ref u, ref Vertices[u.i, u.j + 1], Weight[u.i, u.j, 0]);
+                Relax(ref u, ref Vertices[u.i, u.j + 1], GetWeight(u.i, u.j, u.i, u.j + 1));
 
             if (u.i < Width - 1)
-                Relax(ref u, ref Vertices[u.i+1, u.j], Weight[u.i, u.j, 1]);
+                Relax(ref u, ref Vertices[u.i + 1, u.j], GetWeight(u.i, u.j, u.i + 1, u.j));
 
-            if (u.j >0)
-                Relax(ref u, ref Vertices[u.i, u.j - 1], Weight[u.i, u.j, 2]);
+            if (u.j > 0)
+                Relax(ref u, ref Vertices[u.i, u.j - 1], GetWeight(u.i, u.j, u.i, u.j - 1));
 
-            if (u.i >0)
-                Relax(ref u, ref Vertices[u.i - 1, u.j], Weight[u.i, u.j, 3]);
+            if (u.i > 0)
+                Relax(ref u, ref Vertices[u.i - 1, u.j], GetWeight(u.i, u.j, u.i - 1, u.j));
         }
+
         void Relax(ref Vertex u, ref Vertex v, double w)
         {
             //Relaxes the edges between u and v
-            if(v.Distance>u.Distance+ w)
+            if (v.Distance > u.Distance + w)
             {
                 v.Distance = u.Distance + w;
                 Tuple<int, int> temp = new Tuple<int, int>(u.i, u.j);
                 v.Parent = temp;
                 v.VerticesToParent = u.VerticesToParent + 1;
-                while (Q.parent(v.index)>0&&Q.arr[v.index].Distance<Q.arr[Q.parent(v.index)].Distance)
+                while (Q.parent(v.index) > 0 && Q.arr[v.index].Distance < Q.arr[Q.parent(v.index)].Distance)
                 {
-                    
-                    Q.Swap<Vertex>(ref Q.arr[v.index],ref  Q.arr[Q.parent(v.index)]);
-                    Q.Swap<int>(ref Q.arr[v.index].index, ref  Q.arr[Q.parent(v.index)].index);
-                } 
+
+                    Q.Swap<Vertex>(ref Q.arr[v.index], ref Q.arr[Q.parent(v.index)]);
+                    Q.Swap<int>(ref Q.arr[v.index].index, ref Q.arr[Q.parent(v.index)].index);
+                }
             }
         }
+
         public void Dijkstra(int x, int y)
         {
             //Destroys any previous calculations and calculate the shortest path from the given point
@@ -205,20 +209,20 @@ namespace IntelligentScissors
             //Pruning distance
             int diff = 250;
             Vertex[,] Vertices1;
-            int Width2=0, Height2=0,x1,x2,y1,y2;
-            
+            int Width2 = 0, Height2 = 0, x1, x2, y1, y2;
+
             x1 = Math.Max(x - diff, 0);
             x2 = Math.Min(Width, x + diff);
             y1 = Math.Max(y - diff, 0);
             y2 = Math.Min(Height, y + diff);
             Width2 = x2 - x1;
-            Height2= y2-y1;
+            Height2 = y2 - y1;
             Vertices1 = new Vertex[Width2, Height2];
             int w1 = 0, h1 = 0;
-            for(int i= x1; i< x2; i++)
+            for (int i = x1; i < x2; i++)
             {
                 h1 = 0;
-                for(int j= y1; j< y2; j++)
+                for (int j = y1; j < y2; j++)
                 {
                     Vertices1[w1, h1] = Vertices[i, j];
                     h1++;
@@ -230,15 +234,17 @@ namespace IntelligentScissors
             //End of Pruning
             #endregion
 
-            while (Q.heap_size>0)
+            while (Q.heap_size > 0)
             {
                 //Extract the vertex with minimum distance and relax its edges
                 Vertex u = Q.extract_min();
                 int i = u.i, j = u.j;
                 Relax_All(ref u);
             }
+            Q = null;
+            GC.Collect();
         }
-       
+
 
     }
 }
