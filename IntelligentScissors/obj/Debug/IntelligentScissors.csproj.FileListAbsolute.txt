@@ -21,3 +21,11 @@ C:\Users\alaaa\Desktop\Intelligent-Scissors\IntelligentScissors\obj\Debug\Intell
 C:\Users\alaaa\Desktop\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.MainForm.resources
 C:\Users\alaaa\Desktop\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.Properties.Resources.resources
 C:\Users\alaaa\Desktop\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.csproj.GenerateResource.Cache
+E:\Github\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.exe
+E:\Github\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.pdb
+E:\Github\Intelligent-Scissors\IntelligentScissors\bin\Debug\IntelligentScissors.exe
+E:\Github\Intelligent-Scissors\IntelligentScissors\bin\Debug\IntelligentScissors.pdb
+E:\Github\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.csprojResolveAssemblyReference.cache
+E:\Github\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.MainForm.resources
+E:\Github\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.Properties.Resources.resources
+E:\Github\Intelligent-Scissors\IntelligentScissors\obj\Debug\IntelligentScissors.csproj.GenerateResource.Cache
