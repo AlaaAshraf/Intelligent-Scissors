@@ -200,7 +200,7 @@ namespace IntelligentScissors
 
             #region Pruning
             //Pruning distance
-            int diff = 100;
+            int diff = 250;
             Vertex[,] Vertices1;
             int Width2 = 0, Height2 = 0, x1, x2, y1, y2;
 
