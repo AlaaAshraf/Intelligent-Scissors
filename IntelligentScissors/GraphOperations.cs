@@ -10,7 +10,7 @@ namespace IntelligentScissors
     public class Vertex
     {
         public Tuple<int, int> Parent;
-        public double Distance;
+        public float Distance;
         public int VerticesToParent; //Number of vertices between current vertex and its parent
         public int i, j; //(i,j)->position of the vertex in the array Vertices
         public int index; //index of the vertex in the heap
@@ -20,7 +20,7 @@ namespace IntelligentScissors
             j = y;
             i = x;
             Parent = null;
-            Distance = double.MaxValue;
+            Distance = float.MaxValue;
             VerticesToParent = 0;
         }
     }
@@ -174,9 +174,11 @@ namespace IntelligentScissors
                 Relax(ref u, ref Vertices[u.i - 1, u.j], GetWeight(u.i, u.j, u.i - 1, u.j));
         }
 
-        void Relax(ref Vertex u, ref Vertex v, double w)
+        void Relax(ref Vertex u, ref Vertex v, float w)
         {
             //Relaxes the edges between u and v
+            if (u == null || v == null)
+                return;
             if (v.Distance > u.Distance + w)
             {
                 v.Distance = u.Distance + w;
@@ -194,20 +196,11 @@ namespace IntelligentScissors
 
         public void Dijkstra(int x, int y)
         {
-            //Destroys any previous calculations and calculate the shortest path from the given point
-            for (int i = 0; i < Width; i++)
-            {
-                for (int j = 0; j < Height; j++)
-                {
-                    Vertices[i, j] = new Vertex(i, j);
-                }
-            }
-            //Set the source distance to zero
-            Vertices[x, y].Distance = 0;
+            
 
             #region Pruning
             //Pruning distance
-            int diff = 250;
+            int diff = 100;
             Vertex[,] Vertices1;
             int Width2 = 0, Height2 = 0, x1, x2, y1, y2;
 
@@ -218,6 +211,18 @@ namespace IntelligentScissors
             Width2 = x2 - x1;
             Height2 = y2 - y1;
             Vertices1 = new Vertex[Width2, Height2];
+
+            //Destroys any previous calculations and calculate the shortest path from the given point
+            for (int i = x1; i < x2; i++)
+            {
+                for (int j = y1; j < y2; j++)
+                {
+                    Vertices[i, j] = new Vertex(i, j);
+                }
+            }
+            //Set the source distance to zero
+            Vertices[x, y].Distance = 0;
+
             int w1 = 0, h1 = 0;
             for (int i = x1; i < x2; i++)
             {

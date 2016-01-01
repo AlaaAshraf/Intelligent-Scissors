@@ -71,11 +71,14 @@ namespace IntelligentScissors
 
         private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
         {
+            
             if (firstClick == true)
             {
                 curClick = new Vector2D();
                 curClick.X = e.X;
                 curClick.Y = e.Y;
+                if (G.Vertices[(int)curClick.X, (int)curClick.Y] == null)
+                    return;
                 if (userAutomaticAnchor == true)
                 {
                     if (AutomaticAnchor() == true)
@@ -126,6 +129,8 @@ namespace IntelligentScissors
             Vertex u = new Vertex(0, 0);
             Vertex parent = new Vertex(0, 0);
             u = G.Vertices[(int)curClick.X, (int)curClick.Y];
+            if (u == null)
+                return false;
             if (u.VerticesToParent <= frequency)
                 return false;
            
@@ -149,6 +154,8 @@ namespace IntelligentScissors
             Bitmap b = new Bitmap(beforeClick);
             //int even = 0;
             u = G.Vertices[(int)curClick.X, (int)curClick.Y];
+            if (u == null)
+                return;
             while (u.Parent != null && (u.Parent.Item1 != prevClick.X || u.Parent.Item2 != prevClick.Y))
             {
                 parent= G.Vertices[(int)u.Parent.Item1, (int)u.Parent.Item2];
@@ -162,7 +169,7 @@ namespace IntelligentScissors
             }
             pictureBox2.Image = b;
             pictureBox2.Refresh();
-
+            GC.Collect();
 
         }
 

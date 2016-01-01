@@ -185,7 +185,7 @@ namespace IntelligentScissors
                 ImageBMP.UnlockBits(bmd);
             }
             PicBox.Image = ImageBMP;
-            //GC.Collect();
+            GC.Collect();
         }
 
 
