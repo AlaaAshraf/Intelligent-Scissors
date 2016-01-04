@@ -11,9 +11,9 @@ namespace IntelligentScissors
     {
         public Tuple<int, int> Parent;
         public float Distance;
-        public int VerticesToParent; //Number of vertices between current vertex and its parent
-        public int i, j; //(i,j)->position of the vertex in the array Vertices
-        public int index; //index of the vertex in the heap
+        public int ImageVerticesToParent; // Number of ImageVertices between current vertex and its parent
+        public int i, j; // (i,j)->position of the vertex in the array ImageVertices
+        public int index; // index of the vertex in the heap
 
         public Vertex(int x, int y)
         {
@@ -21,7 +21,7 @@ namespace IntelligentScissors
             i = x;
             Parent = null;
             Distance = float.MaxValue;
-            VerticesToParent = 0;
+            ImageVerticesToParent = 0;
         }
     }
 
@@ -74,8 +74,9 @@ namespace IntelligentScissors
             }
 
         }
-        public priority_queue(ref Vertex[,] Vertices, int Height, int Width)
+        public priority_queue(ref Vertex[,] ImageVertices, int Height, int Width)
         {
+            
             length = Height * Width;
             heap_size = length;
             arr = new Vertex[length + 1];
@@ -84,9 +85,9 @@ namespace IntelligentScissors
             {
                 for (int j = 0; j < Height; j++)
                 {
-                    arr[index] = Vertices[i, j];
-                    //Vertices[i, j].Distance = 757;
-                    Vertices[i, j].index = index;
+                    arr[index] = ImageVertices[i, j];
+                    //ImageVertices[i, j].Distance = 757;
+                    ImageVertices[i, j].index = index;
                     index++;
                 }
             }
@@ -114,19 +115,25 @@ namespace IntelligentScissors
         public int Height, Width;
         RGBPixel[,] ImageMatrix;
         //First dimension represents the width and the second represents the height
-        public Vertex[,] Vertices;
+        public Vertex[,] ImageVertices;
+        public bool[,] isValid;
         public priority_queue Q;
 
         public Graph(RGBPixel[,] ImageMatrix)
         {
             this.ImageMatrix = ImageMatrix;
-
             //Get Width and Height
             Height = ImageOperations.GetHeight(ImageMatrix);
             Width = ImageOperations.GetWidth(ImageMatrix);
             GC.Collect();
-            //Allocate 2D array of vertices
-            Vertices = new Vertex[Width, Height];
+            //Allocate 2D array of ImageVertices
+            ImageVertices = new Vertex[Width, Height];
+            isValid = new bool[Width, Height];
+            for(int i=0; i<Width; i++)
+            {
+                for (int j = 0; j < Height; j++)
+                    isValid[i, j] = true;
+            }
         }
 
         private float GetWeight(int x1, int y1, int x2, int y2)
@@ -136,7 +143,7 @@ namespace IntelligentScissors
             {
                 float temp = (float)ImageOperations.CalculatePixelEnergies(x1, y1, ImageMatrix).X;
                 if (temp != 0) return (float)1.0 / temp;
-                return 1E30f;
+                return 1E30f; // To avoid dividing by zero
             }
             else if (x2 < x1) // First cell to the right of the second cell
             {
@@ -162,29 +169,31 @@ namespace IntelligentScissors
         {
             //Relaxes the edges between u and all its neighbours
             if (u.j < Height - 1)
-                Relax(ref u, ref Vertices[u.i, u.j + 1], GetWeight(u.i, u.j, u.i, u.j + 1));
+                Relax(ref u, ref ImageVertices[u.i, u.j + 1], GetWeight(u.i, u.j, u.i, u.j + 1));
 
             if (u.i < Width - 1)
-                Relax(ref u, ref Vertices[u.i + 1, u.j], GetWeight(u.i, u.j, u.i + 1, u.j));
+                Relax(ref u, ref ImageVertices[u.i + 1, u.j], GetWeight(u.i, u.j, u.i + 1, u.j));
 
             if (u.j > 0)
-                Relax(ref u, ref Vertices[u.i, u.j - 1], GetWeight(u.i, u.j, u.i, u.j - 1));
+                Relax(ref u, ref ImageVertices[u.i, u.j - 1], GetWeight(u.i, u.j, u.i, u.j - 1));
 
             if (u.i > 0)
-                Relax(ref u, ref Vertices[u.i - 1, u.j], GetWeight(u.i, u.j, u.i - 1, u.j));
+                Relax(ref u, ref ImageVertices[u.i - 1, u.j], GetWeight(u.i, u.j, u.i - 1, u.j));
         }
 
         void Relax(ref Vertex u, ref Vertex v, float w)
         {
             //Relaxes the edges between u and v
-            if (u == null || v == null)
+
+            if (u == null || v == null||(!isValid[v.i, v.j]))
                 return;
+
             if (v.Distance > u.Distance + w)
             {
                 v.Distance = u.Distance + w;
                 Tuple<int, int> temp = new Tuple<int, int>(u.i, u.j);
                 v.Parent = temp;
-                v.VerticesToParent = u.VerticesToParent + 1;
+                v.ImageVerticesToParent = u.ImageVerticesToParent + 1;
                 while (Q.parent(v.index) > 0 && Q.arr[v.index].Distance < Q.arr[Q.parent(v.index)].Distance)
                 {
 
@@ -201,27 +210,27 @@ namespace IntelligentScissors
             #region Pruning
             //Pruning distance
             int diff = 250;
-            Vertex[,] Vertices1;
+            Vertex[,] WindowVertices;
             int Width2 = 0, Height2 = 0, x1, x2, y1, y2;
-
+            
             x1 = Math.Max(x - diff, 0);
             x2 = Math.Min(Width, x + diff);
             y1 = Math.Max(y - diff, 0);
             y2 = Math.Min(Height, y + diff);
             Width2 = x2 - x1;
             Height2 = y2 - y1;
-            Vertices1 = new Vertex[Width2, Height2];
+            WindowVertices = new Vertex[Width2, Height2];
 
             //Destroys any previous calculations and calculate the shortest path from the given point
             for (int i = x1; i < x2; i++)
             {
                 for (int j = y1; j < y2; j++)
                 {
-                    Vertices[i, j] = new Vertex(i, j);
+                    ImageVertices[i, j] = new Vertex(i, j);
                 }
             }
             //Set the source distance to zero
-            Vertices[x, y].Distance = 0;
+            ImageVertices[x, y].Distance = 0;
 
             int w1 = 0, h1 = 0;
             for (int i = x1; i < x2; i++)
@@ -229,13 +238,13 @@ namespace IntelligentScissors
                 h1 = 0;
                 for (int j = y1; j < y2; j++)
                 {
-                    Vertices1[w1, h1] = Vertices[i, j];
+                    WindowVertices[w1, h1] = ImageVertices[i, j];
                     h1++;
                 }
                 w1++;
             }
-            //Priority queue using heap containing all vertices
-            Q = new priority_queue(ref Vertices1, Height2, Width2);
+            //Priority queue using heap containing all ImageVertices
+            Q = new priority_queue(ref WindowVertices, Height2, Width2);
             //End of Pruning
             #endregion
 
@@ -247,7 +256,7 @@ namespace IntelligentScissors
                 Relax_All(ref u);
             }
             Q = null;
-            GC.Collect();
+            GC.Collect(); // Manually calling the garbage collector
         }
 
 

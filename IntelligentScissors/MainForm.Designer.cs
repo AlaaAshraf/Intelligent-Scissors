@@ -28,7 +28,7 @@ namespace IntelligentScissors
         /// </summary>
         private void InitializeComponent()
         {
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.originalImage = new System.Windows.Forms.PictureBox();
             this.btnOpen = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -47,21 +47,21 @@ namespace IntelligentScissors
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.userDifference = new System.Windows.Forms.TextBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.originalImage)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaskSize)).BeginInit();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
-            // pictureBox2
+            // originalImage
             // 
-            this.pictureBox2.Location = new System.Drawing.Point(3, 3);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(412, 360);
-            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pictureBox2.TabIndex = 1;
-            this.pictureBox2.TabStop = false;
-            this.pictureBox2.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseClick);
-            this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseMove);
+            this.originalImage.Location = new System.Drawing.Point(3, 3);
+            this.originalImage.Name = "originalImage";
+            this.originalImage.Size = new System.Drawing.Size(412, 360);
+            this.originalImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.originalImage.TabIndex = 1;
+            this.originalImage.TabStop = false;
+            this.originalImage.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OriginalImage_MouseClick);
+            this.originalImage.MouseMove += new System.Windows.Forms.MouseEventHandler(this.originalImage_MouseMove);
             // 
             // btnOpen
             // 
@@ -204,7 +204,7 @@ namespace IntelligentScissors
             // 
             this.panel2.AutoScroll = true;
             this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.panel2.Controls.Add(this.pictureBox2);
+            this.panel2.Controls.Add(this.originalImage);
             this.panel2.Location = new System.Drawing.Point(26, 12);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1322, 506);
@@ -281,7 +281,7 @@ namespace IntelligentScissors
             this.Controls.Add(this.btnOpen);
             this.Name = "MainForm";
             this.Text = "Intelligent Scissors...";
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.originalImage)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaskSize)).EndInit();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
@@ -291,7 +291,7 @@ namespace IntelligentScissors
         }
 
         #endregion
-        public System.Windows.Forms.PictureBox pictureBox2;
+        public System.Windows.Forms.PictureBox originalImage;
         private System.Windows.Forms.Button btnOpen;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Text;
 using System.Windows.Forms;
 
@@ -19,9 +20,9 @@ namespace IntelligentScissors
         Graph G;
         int frequency;
         double energyDifference;
-        bool firstClick,userAutomaticAnchor=false;
-        Vector2D prevClick, curClick;
-        Bitmap beforeClick;
+        bool firstClick,userAutomaticAnchor=false,setValid;
+        Vector2D prevClick, curClick,firstPosition;
+        Bitmap temp;
 
         private void btnOpen_Click(object sender, EventArgs e)
         {
@@ -31,14 +32,16 @@ namespace IntelligentScissors
                 //Open the browsed image and display it
                 string OpenedFilePath = openFileDialog1.FileName;
                 ImageMatrix = ImageOperations.OpenImage(OpenedFilePath);
-                ImageOperations.DisplayImage(ImageMatrix, pictureBox2);
+                ImageOperations.DisplayImage(ImageMatrix, originalImage);
             }
             txtWidth.Text = ImageOperations.GetWidth(ImageMatrix).ToString();
             txtHeight.Text = ImageOperations.GetHeight(ImageMatrix).ToString();
             //Build the graph
             G = new Graph(ImageMatrix);
-            firstClick = false;
+            firstClick = setValid = false;
             prevClick = new Vector2D();
+            firstPosition = new Vector2D();
+            temp = new Bitmap(originalImage.Image);
         }
 
         private void btnGaussSmooth_Click(object sender, EventArgs e)
@@ -47,20 +50,26 @@ namespace IntelligentScissors
             int maskSize = (int)nudMaskSize.Value ;
             ImageMatrix = ImageOperations.GaussianFilter1D(ImageMatrix, maskSize, sigma);
             //Build the graph
+            firstClick = setValid = false;
+            prevClick = new Vector2D();
+            firstPosition = new Vector2D();
             G = null;
             GC.Collect();
             G = new Graph(ImageMatrix);
+            ImageOperations.DisplayImage(ImageMatrix, originalImage);
+            temp = new Bitmap(originalImage.Image);
             
-            ImageOperations.DisplayImage(ImageMatrix, pictureBox2);
         }
-        
-        private void pictureBox2_MouseClick(object sender, MouseEventArgs e)
+
+        private void OriginalImage_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
+                
+                MouseClick(firstPosition);
                 firstClick = false;
-                pictureBox2.Image = beforeClick;
-                pictureBox2.Refresh();
+                //originalImage.Image = (Bitmap)temp.Clone();
+                //originalImage.Refresh();
                 return;
             }
             Vector2D Position = new Vector2D();
@@ -69,7 +78,7 @@ namespace IntelligentScissors
             MouseClick(Position);
         }
 
-        private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
+        private void originalImage_MouseMove(object sender, MouseEventArgs e)
         {
             
             if (firstClick == true)
@@ -77,15 +86,18 @@ namespace IntelligentScissors
                 curClick = new Vector2D();
                 curClick.X = e.X;
                 curClick.Y = e.Y;
-                if (G.Vertices[(int)curClick.X, (int)curClick.Y] == null)
+                originalImage.Image = (Bitmap)temp.Clone();
+                originalImage.Refresh();
+                if (G.ImageVertices[(int)curClick.X, (int)curClick.Y] == null)
                     return;
                 if (userAutomaticAnchor == true)
                 {
                     if (AutomaticAnchor() == true)
+                    {
                         return;
+                    }
                 }
-                pictureBox2.Image = beforeClick;
-                pictureBox2.Refresh();
+                
                 Draw();
             }
         }
@@ -99,26 +111,62 @@ namespace IntelligentScissors
                 firstClick = true;
                 prevClick.X = e.X;
                 prevClick.Y = e.Y;
+                firstPosition = prevClick;
 
             }
             else
             {
+                originalImage.Refresh();
                 curClick = new Vector2D();
                 curClick.X = e.X;
                 curClick.Y = e.Y;
+                setValid = true;
                 Draw();
+                setValid = false;
+                temp = (Bitmap)originalImage.Image;
                 prevClick = curClick;
             }
             //Destroys the previous calculation and calculates again in O((V+E)log(V))
             G.Dijkstra((int)prevClick.X, (int)prevClick.Y);
-            //Stores the image after each click
-            beforeClick = (Bitmap)(pictureBox2.Image.Clone());
         }
+
+        private void Draw()
+        {
+            Vertex u = new Vertex(0, 0);
+            Vertex parent = new Vertex(0, 0);
+            u = G.ImageVertices[(int)curClick.X, (int)curClick.Y];
+            if (u == null)
+                return;
+            
+            Graphics Gr = Graphics.FromImage(originalImage.Image);
+            
+            while (u.Parent != null && (u.Parent.Item1 != prevClick.X || u.Parent.Item2 != prevClick.Y))
+            {
+                parent = G.ImageVertices[(int)u.Parent.Item1, (int)u.Parent.Item2];
+                if(setValid==true)
+                G.isValid[parent.i, parent.j] = false;
+                using (var p = new Pen(Color.AntiqueWhite, 1))
+                {
+                    
+                    Gr.DrawLine(p, new Point(u.i, u.j), new Point(parent.i, parent.j));
+                    
+                }
+                u = parent;
+
+            }
+            
+            originalImage.Refresh();
+            GC.Collect();
+
+        }
+
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             userAutomaticAnchor = !userAutomaticAnchor;
         }
+
+        
 
         private bool AutomaticAnchor()
         {
@@ -128,51 +176,29 @@ namespace IntelligentScissors
             energyDifference = double.Parse(userDifference.Text);
             Vertex u = new Vertex(0, 0);
             Vertex parent = new Vertex(0, 0);
-            u = G.Vertices[(int)curClick.X, (int)curClick.Y];
+            u = G.ImageVertices[(int)curClick.X, (int)curClick.Y];
             if (u == null)
                 return false;
-            if (u.VerticesToParent <= frequency)
+            if (u.ImageVerticesToParent <= frequency)
                 return false;
-           
-                parent = G.Vertices[(int)u.Parent.Item1, (int)u.Parent.Item2];
+            int tempCount = 0;
+            while (u.Parent != null && (u.Parent.Item1 != prevClick.X || u.Parent.Item2 != prevClick.Y))
+            {
+                if (tempCount > frequency / 2)
+                    break;
+                parent = G.ImageVertices[(int)u.Parent.Item1, (int)u.Parent.Item2];
                 double distanceDifference = Math.Abs(u.Distance - parent.Distance);
-                if(distanceDifference>energyDifference)
+                u = parent;
+                if (distanceDifference > energyDifference)
                 {
                     curClick.X = u.i;
                     curClick.Y = u.j;
                 }
-                u = parent;
+                tempCount++;
+            }
             
             MouseClick(curClick);
             return true;
         }
-
-        private void Draw()
-        {
-            Vertex u = new Vertex(0, 0);
-            Vertex parent = new Vertex(0, 0);
-            Bitmap b = new Bitmap(beforeClick);
-            //int even = 0;
-            u = G.Vertices[(int)curClick.X, (int)curClick.Y];
-            if (u == null)
-                return;
-            while (u.Parent != null && (u.Parent.Item1 != prevClick.X || u.Parent.Item2 != prevClick.Y))
-            {
-                parent= G.Vertices[(int)u.Parent.Item1, (int)u.Parent.Item2];
-                if ((u.i+u.j) % 2 == 0)
-                { b.SetPixel((u.i), (u.j), Color.Black); }
-                else
-                { b.SetPixel((u.i), (u.j), Color.White); }
-                //even++;
-                u = parent;
-                
-            }
-            pictureBox2.Image = b;
-            pictureBox2.Refresh();
-            GC.Collect();
-
-        }
-
-        
     }
 }
