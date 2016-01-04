@@ -68,6 +68,11 @@ namespace IntelligentScissors
                 
                 MouseClick(firstPosition);
                 firstClick = false;
+                for (int i = 0; i < G.Width; i++)
+                {
+                    for (int j = 0; j < G.Height; j++)
+                        G.isValid[i, j] = true;
+                }
                 //originalImage.Image = (Bitmap)temp.Clone();
                 //originalImage.Refresh();
                 return;
